@@ -19,16 +19,16 @@ BORDER = pygame.Rect(WIDTH//2 - 5, 0, 10, HEIGHT)   # border in the middle of th
 #BULLET_HIT_SOUND = pygame.mixer.Sound('Assets/Grenade+1.mp3')
 #BULLET_FIRE_SOUND = pygame.mixer.Sound('Assets/Gun+Silencer.mp3')
 
-HEALTH_FONT = pygame.font.SysFont('comicsans', 40)
+HEALTH_FONT = pygame.font.SysFont('comicsans', 40) # define a font and the font size
 WINNER_FONT = pygame.font.SysFont('comicsans', 100)
 
 FPS = 60   
 VEL = 5  
 BULLET_VEL = 7
-MAX_BULLETS = 3
-SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
-
-YELLOW_HIT = pygame.USEREVENT + 1
+MAX_BULLETS = 3   # number max of bullet for each spaceship at one time so that we can't shoot more that 3 bullets a one time 
+SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40  # taille et largeur des caracteres 
+  
+YELLOW_HIT = pygame.USEREVENT + 1 # to have a unique event 
 RED_HIT = pygame.USEREVENT + 2
 
 YELLOW_SPACESHIP_IMAGE = pygame.image.load(
@@ -42,15 +42,17 @@ RED_SPACESHIP = pygame.transform.rotate(pygame.transform.scale(
     RED_SPACESHIP_IMAGE, (SPACESHIP_WIDTH, SPACESHIP_HEIGHT)), 270)  # to rotate the image to 270 deg because we want to face the other yellow spaceship and scale to resize the img width and height
 
 SPACE = pygame.transform.scale(pygame.image.load(
-    os.path.join('Assets', 'space.png')), (WIDTH, HEIGHT)) 
+    os.path.join('Assets', 'space.png')), (WIDTH, HEIGHT)) # we add the space.png photo to the background and scale it 
+    # so that it's go all over the window width and height 
 
 
 def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_health):
-    WIN.blit(SPACE, (0, 0))  
+    WIN.blit(SPACE, (0, 0))   # we put the actual background to the screen and it's start to (0,0) the left hand side corner 
     pygame.draw.rect(WIN, BLACK, BORDER) # we draw a rectangle on the window with a black color  
 
     red_health_text = HEALTH_FONT.render(
-        "Health: " + str(red_health), 1, WHITE)
+        "Health: " + str(red_health), 1, WHITE) # will take the text and put it on the font we define on the top and str red_health
+        # to convert what ever the red health is to a string so that we can concatenate to string together which is "Health: " and red health
     yellow_health_text = HEALTH_FONT.render(
         "Health: " + str(yellow_health), 1, WHITE)
     WIN.blit(red_health_text, (WIDTH - red_health_text.get_width() - 10, 10))
@@ -61,12 +63,12 @@ def draw_window(red, yellow, red_bullets, yellow_bullets, red_health, yellow_hea
     WIN.blit(RED_SPACESHIP, (red.x, red.y))
 
     for bullet in red_bullets:
-        pygame.draw.rect(WIN, RED, bullet)
+        pygame.draw.rect(WIN, RED, bullet) # we draw the red (color ) bullet on the screen (WIN) we use for because each spaceship have multiple bullets (3)
 
     for bullet in yellow_bullets:
-        pygame.draw.rect(WIN, YELLOW, bullet)
+        pygame.draw.rect(WIN, YELLOW, bullet)  # same here 
 
-    pygame.display.update()
+    pygame.display.update()  # this is to update the WIN every time so that every we put in the win display appear without refreshing for example
 
 
 def yellow_handle_movement(keys_pressed, yellow):
@@ -98,28 +100,28 @@ def red_handle_movement(keys_pressed, red):  #take the key_pressed and the red s
 
 def handle_bullets(yellow_bullets, red_bullets, yellow, red):
     for bullet in yellow_bullets:
-        bullet.x += BULLET_VEL
-        if red.colliderect(bullet):
+        bullet.x += BULLET_VEL   # to move the bullet from the left to the right 
+        if red.colliderect(bullet):   # if the yellow bullet collide with the red caracter will be hit and lose health
             pygame.event.post(pygame.event.Event(RED_HIT))
-            yellow_bullets.remove(bullet)
-        elif bullet.x > WIDTH:
+            yellow_bullets.remove(bullet)  # we remove the bullet to the yellow_bullets list so that it will remain 2 bullets more
+        elif bullet.x > WIDTH: # if the bullet hit the screen and don't touch the red carac will remove the bullet again
             yellow_bullets.remove(bullet)
 
     for bullet in red_bullets:
-        bullet.x -= BULLET_VEL
+        bullet.x -= BULLET_VEL   # quitte de droite a gauche 
         if yellow.colliderect(bullet):
             pygame.event.post(pygame.event.Event(YELLOW_HIT))
             red_bullets.remove(bullet)
         elif bullet.x < 0:
-            red_bullets.remove(bullet)
+            red_bullets.remove(bullet) 
 
 
-def draw_winner(text):
+def draw_winner(text):  
     draw_text = WINNER_FONT.render(text, 1, WHITE)
     WIN.blit(draw_text, (WIDTH/2 - draw_text.get_width() /
                          2, HEIGHT/2 - draw_text.get_height()/2))
     pygame.display.update()
-    pygame.time.delay(5000)
+    pygame.time.delay(5000)  # add a delay of 5s and show which player wins
 
 
 def main():
@@ -144,13 +146,17 @@ def main():
             if event.type == pygame.KEYDOWN: # that's means if a user type something on the keyboard do the follow instruction
                 if event.key == pygame.K_LCTRL and len(yellow_bullets) < MAX_BULLETS: # if the user press the left control do the follow instruction 
                     bullet = pygame.Rect(
-                        yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5)
-                    yellow_bullets.append(bullet)
+                        yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5) #so that the bullet come from the middle of the 
+                        #yellow image yellow.x + yellow.width to put the bullet on the edge of the image (donc a la fin de la largeur de l'image)
+                        # width of the pixel 10 and 5 the height 
+                    yellow_bullets.append(bullet)  #we append the bullet to the yellow_bullets list create on the top of the programm
                     #BULLET_FIRE_SOUND.play()
 
-                if event.key == pygame.K_RCTRL and len(red_bullets) < MAX_BULLETS:
+                if event.key == pygame.K_RCTRL and len(red_bullets) < MAX_BULLETS:  # len(red_bullets) we gonna check that the actual number of red_bullets which is a list have not already 
+                    # pass the actual max numb of bullet for each if that's ok we can shoot another bullet 
                     bullet = pygame.Rect(
-                        red.x, red.y + red.height//2 - 2, 10, 5)
+                        red.x, red.y + red.height//2 - 2, 10, 5) # vu qu'on est a gauche la coordonnée x du rectangle s'arrete deja juste devant le debut de l'image qui est retournée , 
+                        # qui est en face de l'image si on avait pas rotate the image we will add the width of the image as well like we did for the yellow_bulet
                     red_bullets.append(bullet)
                     #BULLET_FIRE_SOUND.play()
 
@@ -163,7 +169,7 @@ def main():
                 #BULLET_HIT_SOUND.play()
 
         winner_text = ""
-        if red_health <= 0:
+        if red_health <= 0:   # si la vie du rouge carac est plus petit ou egale a zero print the yellow caract wins 
             winner_text = "Yellow Wins!"
 
         if yellow_health <= 0:
@@ -183,7 +189,8 @@ def main():
         draw_window(red, yellow, red_bullets, yellow_bullets,
                     red_health, yellow_health)
 
-    main()
+    main()  # to not quit the game directly and will allow the user to only quit with the x button to quit manually basically so that 
+    
 
 
 if __name__ == "__main__":   # basically tell we gonna run the game in the main not import 
